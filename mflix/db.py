@@ -413,7 +413,7 @@ def add_user(name, email, hashedpw):
         # Insert a user with the "name", "email", and "password" fields.
         # TODO: Durable Writes
         # Use a more durable Write Concern for this operation.
-        db.users.insert_one({
+        db.users.with_options(write_concern=WriteConcern(w="majority")).insert_one({
             "name": name,
             "email": email,
             "password": hashedpw
@@ -509,8 +509,8 @@ def update_prefs(email, prefs):
         # TODO: User preferences
         # Use the data in "prefs" to update the user's preferences.
         response = db.users.update_one(
-            { "some_field": "some_value" },
-            { "$set": { "some_other_field": "some_other_value" } }
+            { "email": email },
+            { "$set": { "preferences": prefs } }
         )
         if response.matched_count == 0:
             return {'error': 'no user found'}
